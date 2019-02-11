@@ -18,13 +18,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"time"
+
 	"github.com/gardener/gardener-extensions/pkg/controller/cmd"
 	"github.com/gardener/gardener-extensions/pkg/controller/version"
 	extensionsv1alpha1 "github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -36,7 +38,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	"time"
 )
 
 // DefaultMaxConcurrentReconciles is the default number of maximum concurrent reconciles.
@@ -159,7 +160,7 @@ func (c *CommandOptions) Flags() cmd.NamedFlagSet {
 func NewManagerOptions(name string) *ManagerOptions {
 	return &ManagerOptions{
 		LeaderElectionID:        fmt.Sprintf("%s-leader-election", name),
-		LeaderElectionNamespace: v1.NamespaceSystem,
+		LeaderElectionNamespace: metav1.NamespaceSystem,
 	}
 }
 
@@ -251,7 +252,7 @@ func Run(ctx context.Context, config *CompletedConfig) error {
 
 	mgr, err := manager.New(config.REST, config.Manager.Options)
 	if err != nil {
-		log.Error(err, "Could not instantiate controller-manager")
+		log.Error(err, "Could not instantiate manager")
 		return err
 	}
 

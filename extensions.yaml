@@ -7,3 +7,6 @@ extensions:
 - name: os-coreos-alibaba
   gitHubRepo: https://github.com/gardener/gardener-extensions
   path: controllers/os-coreos-alibaba
+- name: provider-aws
+  gitHubRepo: https://github.com/gardener/gardener-extensions
+  path: controllers/provider-aws

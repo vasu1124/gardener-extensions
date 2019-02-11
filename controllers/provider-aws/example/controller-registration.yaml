@@ -1,0 +1,16 @@
+---
+apiVersion: core.gardener.cloud/v1alpha1
+kind: ControllerRegistration
+metadata:
+  name: provider-aws
+spec:
+  resources:
+  - kind: WorkerPool
+    type: aws
+  deployment:
+    type: helm
+    providerConfig:
+      chart: TODO
+      values:
+        image:
+          tag: 0.2.0-dev

@@ -13,11 +13,11 @@
 # limitations under the License.
 
 REGISTRY         := eu.gcr.io/gardener-project
-IMAGE_PREFIX     := $(REGISTRY)/gardener-extension-os-coreos
+IMAGE_PREFIX     := $(REGISTRY)/gardener
 REPO_ROOT        := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 HACK_DIR         := $(REPO_ROOT)/hack
 VERSION          := $(shell cat $(REPO_ROOT)/VERSION)
-LD_FLAGS         := "-w -X github.com/gardener/gardener-extensions/gardener-extension-os-coreos/pkg/version.Version=$(IMAGE_TAG)"
+LD_FLAGS         := "-w -X github.com/gardener/gardener-extensions/pkg/version.Version=$(IMAGE_TAG)"
 VERIFY           := true
 
 ### Build commands
@@ -73,9 +73,13 @@ docker-image-os-coreos:
 docker-image-os-coreos-alibaba:
 	@docker build --build-arg VERIFY=$(VERIFY) -t $(IMAGE_PREFIX)/gardener-extension-os-coreos-alibaba:$(VERSION) -t $(IMAGE_PREFIX)/gardener-extension-os-coreos-alibaba:$(VERSION) -f Dockerfile --target gardener-extension-os-coreos-alibaba .
 
+.PHONY: docker-image-provider-aws
+docker-image-provider-aws:
+	@docker build --build-arg VERIFY=$(VERIFY) -t $(IMAGE_PREFIX)/gardener-extension-provider-aws:$(VERSION) -t $(IMAGE_PREFIX)/gardener-extension-provider-aws:$(VERSION) -f Dockerfile --target gardener-extension-provider-aws .
+
 
 .PHONY: docker-images
-docker-images: docker-image-hyper docker-image-os-coreos docker-image-os-coreos-alibaba
+docker-images: docker-image-hyper docker-image-os-coreos docker-image-os-coreos-alibaba docker-image-provider-aws
 
 ### Debug / Development commands
 
@@ -90,3 +94,7 @@ start-os-coreos:
 .PHONY: start-os-coreos-alibaba
 start-os-coreos-alibaba:
 	@LEADER_ELECTION_NAMESPACE=garden go run -ldflags $(LD_FLAGS) ./controllers/os-coreos-alibaba/cmd/gardener-extension-os-coreos-alibaba
+
+.PHONY: start-provider-aws
+start-provider-aws:
+	@LEADER_ELECTION_NAMESPACE=garden go run -ldflags $(LD_FLAGS) ./controllers/provider-aws/cmd/gardener-extension-provider-aws

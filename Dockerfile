@@ -31,6 +31,13 @@ COPY --from=builder /go/bin/gardener-extension-os-coreos-alibaba /gardener-exten
 
 ENTRYPOINT ["/gardener-extension-os-coreos-alibaba"]
 
+#############      gardener-extension-provider-aws          #############
+FROM base AS gardener-extension-provider-aws
+
+COPY --from=builder /go/bin/gardener-extension-provider-aws /gardener-extension-provider-aws
+
+ENTRYPOINT ["/gardener-extension-provider-aws"]
+
 #############      gardener-extension-hyper                 #############
 FROM base AS gardener-extension-hyper
 
