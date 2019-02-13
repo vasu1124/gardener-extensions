@@ -35,9 +35,9 @@ const (
 	FinalizerName = "extensions.gardener.cloud/workerpoolconfigs"
 )
 
-// workerPoolConfigReconciler reconciles WorkerPool resources of Gardener's
+// workerPoolReconciler reconciles WorkerPool resources of Gardener's
 // `extensions.gardener.cloud` API group.
-type workerPoolConfigReconciler struct {
+type workerPoolReconciler struct {
 	logger   logr.Logger
 	actuator Actuator
 
@@ -45,36 +45,36 @@ type workerPoolConfigReconciler struct {
 	client client.Client
 }
 
-var _ reconcile.Reconciler = &workerPoolConfigReconciler{}
+var _ reconcile.Reconciler = &workerPoolReconciler{}
 
 // NewReconciler creates a new reconcile.Reconciler that reconciles
 // WorkerPool resources of Gardener's `extensions.gardener.cloud` API group.
 func NewReconciler(logger logr.Logger, actuator Actuator) reconcile.Reconciler {
-	return &workerPoolConfigReconciler{logger: logger, actuator: actuator}
+	return &workerPoolReconciler{logger: logger, actuator: actuator}
 }
 
 // InjectFunc enables dependency injection into the actuator.
-func (r *workerPoolConfigReconciler) InjectFunc(f inject.Func) error {
+func (r *workerPoolReconciler) InjectFunc(f inject.Func) error {
 	return f(r.actuator)
 }
 
 // InjectClient injects the controller runtime client into the reconciler.
-func (r *workerPoolConfigReconciler) InjectClient(client client.Client) error {
+func (r *workerPoolReconciler) InjectClient(client client.Client) error {
 	r.client = client
 	return nil
 }
 
 // InjectStopChannel is an implementation for getting the respective stop channel managed by the controller-runtime.
-func (r *workerPoolConfigReconciler) InjectStopChannel(stopCh <-chan struct{}) error {
+func (r *workerPoolReconciler) InjectStopChannel(stopCh <-chan struct{}) error {
 	r.ctx = controller.ContextFromStopChannel(stopCh)
 	return nil
 }
 
 // Reconcile is the reconciler function that gets executed in case there are new events for the `WorkerPool`
 // resources.
-func (r *workerPoolConfigReconciler) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	wpc := &extensionsv1alpha1.WorkerPool{}
-	if err := r.client.Get(r.ctx, request.NamespacedName, wpc); err != nil {
+func (r *workerPoolReconciler) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+	wp := &extensionsv1alpha1.WorkerPool{}
+	if err := r.client.Get(r.ctx, request.NamespacedName, wp); err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -82,60 +82,52 @@ func (r *workerPoolConfigReconciler) Reconcile(request reconcile.Request) (recon
 		return reconcile.Result{}, err
 	}
 
-	if wpc.DeletionTimestamp != nil {
-		return r.delete(r.ctx, wpc)
+	if wp.DeletionTimestamp != nil {
+		return r.delete(r.ctx, wp)
 	}
-	return r.reconcile(r.ctx, wpc)
+	return r.reconcile(r.ctx, wp)
 }
 
-func (r *workerPoolConfigReconciler) reconcile(ctx context.Context, wpc *extensionsv1alpha1.WorkerPool) (reconcile.Result, error) {
+func (r *workerPoolReconciler) reconcile(ctx context.Context, wp *extensionsv1alpha1.WorkerPool) (reconcile.Result, error) {
 	// Add finalizer to resource if not yet done.
-	if finalizers := sets.NewString(wpc.Finalizers...); !finalizers.Has(FinalizerName) {
+	if finalizers := sets.NewString(wp.Finalizers...); !finalizers.Has(FinalizerName) {
 		finalizers.Insert(FinalizerName)
-		wpc.Finalizers = finalizers.UnsortedList()
-		if err := r.client.Update(ctx, wpc); err != nil {
+		wp.Finalizers = finalizers.UnsortedList()
+		if err := r.client.Update(ctx, wp); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
 
-	exist, err := r.actuator.Exists(ctx, wpc)
+	r.logger.Info("Reconciling worker pool triggers idempotent reconciliation.", "wp", wp.Name)
+
+	// XXX: main logic begin
+	_, err := r.actuator.GenerateWorkerPool(ctx, wp)
 	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	if exist {
-		r.logger.Info("Reconciling operating system config triggers idempotent update.", "wpc", wpc.Name)
-		if err := r.actuator.Update(ctx, wpc); err != nil {
-			return controller.ReconcileErr(err)
-		}
-		return reconcile.Result{}, nil
-	}
-
-	r.logger.Info("Reconciling operating system config triggers idempotent create.", "wpc", wpc.Name)
-	if err := r.actuator.Create(ctx, wpc); err != nil {
-		r.logger.Error(err, "Unable to create operating system config", "wpc", wpc.Name)
+		r.logger.Error(err, "Unable to reconcile worker pool", "wp", wp.Name)
 		return controller.ReconcileErr(err)
 	}
+	// XXX: main logic end
+
 	return reconcile.Result{}, nil
 }
 
-func (r *workerPoolConfigReconciler) delete(ctx context.Context, wpc *extensionsv1alpha1.WorkerPool) (reconcile.Result, error) {
-	finalizers := sets.NewString(wpc.Finalizers...)
+func (r *workerPoolReconciler) delete(ctx context.Context, wp *extensionsv1alpha1.WorkerPool) (reconcile.Result, error) {
+	finalizers := sets.NewString(wp.Finalizers...)
 	if !finalizers.Has(FinalizerName) {
-		r.logger.Info("Reconciling operating system config causes a no-op as there is no finalizer.", "wpc", wpc.Name)
+		r.logger.Info("Reconciling worker pool causes a no-op as there is no finalizer.", "wp", wp.Name)
 		return reconcile.Result{}, nil
 	}
 
-	if err := r.actuator.Delete(ctx, wpc); err != nil {
-		r.logger.Error(err, "Error deleting operating system config", "wpc", wpc.Name)
-		return controller.ReconcileErr(err)
-	}
+	// if err := r.actuator.Delete(ctx, wp); err != nil {
+	// 	r.logger.Error(err, "Error deleting worker pool", "wp", wp.Name)
+	// 	return controller.ReconcileErr(err)
+	// }
 
-	r.logger.Info("Operating system config deletion successful, removing finalizer.", "wpc", wpc.Name)
+	r.logger.Info("worker pool deletion successful, removing finalizer.", "wp", wp.Name)
 	finalizers.Delete(FinalizerName)
-	wpc.Finalizers = finalizers.UnsortedList()
-	if err := r.client.Update(ctx, wpc); err != nil {
-		r.logger.Error(err, "Error removing finalizer from operating system config", "wpc", wpc.Name)
+	wp.Finalizers = finalizers.UnsortedList()
+	if err := r.client.Update(ctx, wp); err != nil {
+		r.logger.Error(err, "Error removing finalizer from worker pool", "wp", wp.Name)
 		return reconcile.Result{}, err
 	}
 	return reconcile.Result{}, nil

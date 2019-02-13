@@ -1,0 +1,24 @@
+---
+apiVersion: machine.sapcloud.io/v1alpha1
+kind: AWSMachineClass
+metadata:
+  name: {{ .Values.machinePlacement.class.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ami: {{ .Values.machinePlacement.class.ami }}
+  region: {{ .Values.machinePlacement.class.region }}
+  machineType: {{ .Values.machinePlacement.class.machineType }}
+  iam:
+    name: {{ .Values.machinePlacement.class.iamInstanceProfile }}
+  keyName: {{ .Values.machinePlacement.class.keyName }}
+  networkInterfaces:
+{{ toYaml .Values.machinePlacement.class.networkInterfaces | indent 2 }}
+{{- if .Values.machinePlacement.class.tags }}
+  tags:
+{{ toYaml .Values.machinePlacement.class.tags | indent 4 }}
+{{- end }}
+  secretRef:
+    name: {{ .Values.machinePlacement.class.name }}
+    namespace: {{ .Release.Namespace }}
+  blockDevices:
+{{ toYaml .Values.machinePlacement.class.blockDevices | indent 2 }}

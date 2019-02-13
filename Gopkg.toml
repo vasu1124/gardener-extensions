@@ -44,6 +44,10 @@ required = [
   name = "github.com/spf13/cobra"
   version = "0.0.3"
 
+ [[constraint]]
+   name = "github.com/gardener/machine-controller-manager"
+   version = "0.12.0"
+
 # Dependencies for testing purposes only
 
 [[constraint]]

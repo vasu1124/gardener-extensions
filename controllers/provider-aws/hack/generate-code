@@ -49,5 +49,5 @@ $(dirname $0)/../../../vendor/k8s.io/code-generator/generate-internal-groups.sh 
   github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis \
   github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis \
   "aws:v1alpha1" \
-  --extra-peer-dirs=github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws,github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws/v1alpha1,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/conversion,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/apis/config,k8s.io/apimachinery/pkg/apis/config/v1alpha1,k8s.io/apiserver/pkg/apis/config,k8s.io/apiserver/pkg/apis/config/v1alpha1 \
+  --extra-peer-dirs=github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws,github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws/v1alpha1,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/conversion,k8s.io/apimachinery/pkg/runtime \
   -h <(headers)

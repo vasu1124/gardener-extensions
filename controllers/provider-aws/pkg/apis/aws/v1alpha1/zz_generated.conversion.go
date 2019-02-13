@@ -241,7 +241,7 @@ func Convert_aws_Role_To_v1alpha1_Role(in *aws.Role, out *Role, s conversion.Sco
 }
 
 func autoConvert_v1alpha1_SecurityGroup_To_aws_SecurityGroup(in *SecurityGroup, out *aws.SecurityGroup, s conversion.Scope) error {
-	out.Name = in.Name
+	out.Purpose = in.Purpose
 	out.Id = in.Id
 	return nil
 }
@@ -252,7 +252,7 @@ func Convert_v1alpha1_SecurityGroup_To_aws_SecurityGroup(in *SecurityGroup, out 
 }
 
 func autoConvert_aws_SecurityGroup_To_v1alpha1_SecurityGroup(in *aws.SecurityGroup, out *SecurityGroup, s conversion.Scope) error {
-	out.Name = in.Name
+	out.Purpose = in.Purpose
 	out.Id = in.Id
 	return nil
 }
@@ -263,7 +263,7 @@ func Convert_aws_SecurityGroup_To_v1alpha1_SecurityGroup(in *aws.SecurityGroup, 
 }
 
 func autoConvert_v1alpha1_Subnet_To_aws_Subnet(in *Subnet, out *aws.Subnet, s conversion.Scope) error {
-	out.Name = in.Name
+	out.Purpose = in.Purpose
 	out.Id = in.Id
 	out.Zone = in.Zone
 	return nil
@@ -275,7 +275,7 @@ func Convert_v1alpha1_Subnet_To_aws_Subnet(in *Subnet, out *aws.Subnet, s conver
 }
 
 func autoConvert_aws_Subnet_To_v1alpha1_Subnet(in *aws.Subnet, out *Subnet, s conversion.Scope) error {
-	out.Name = in.Name
+	out.Purpose = in.Purpose
 	out.Id = in.Id
 	out.Zone = in.Zone
 	return nil

@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-// TypePredicate filters the incoming WorkerPoolConfigs for ones that have the same type
+// TypePredicate filters the incoming WorkerPools for ones that have the same type
 // as the given type.
 func TypePredicate(typeName string) predicate.Predicate {
 	typeMatches := func(obj runtime.Object) bool {

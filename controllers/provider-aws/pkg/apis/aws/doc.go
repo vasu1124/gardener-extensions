@@ -15,4 +15,4 @@
 // +k8s:deepcopy-gen=package
 // +groupName="aws.provider.extensions.gardener.cloud"
 
-package config // import "github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws"
+package aws // import "github.com/gardener/gardener-extensions/controllers/provider-aws/pkg/apis/aws"

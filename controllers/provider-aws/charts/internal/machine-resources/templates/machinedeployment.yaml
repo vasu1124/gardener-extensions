@@ -1,0 +1,25 @@
+---
+apiVersion: machine.sapcloud.io/v1alpha1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.machinePlacement.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.machinePlacement.replicas }}
+  minReadySeconds: {{ .Values.machinePlacement.minReadySeconds }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.machinePlacement.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.machinePlacement.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+{{ toYaml .Values.machinePlacement.labels | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ toYaml .Values.machinePlacement.labels | indent 8 }}
+    spec:
+      class:
+        kind: AWSMachineClass
+        name: {{ .Values.machinePlacement.class.name }}

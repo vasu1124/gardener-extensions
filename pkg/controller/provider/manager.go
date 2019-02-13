@@ -60,7 +60,7 @@ func (m *ManagerOptions) Config() (*ManagerConfig, error) {
 		Scheme:     mgrScheme,
 	}
 
-	opts.LeaderElection = m.LeaderElection
+	opts.LeaderElection = false //FIXME m.LeaderElection
 	opts.LeaderElectionID = m.LeaderElectionID
 	opts.LeaderElectionNamespace = m.LeaderElectionNamespace
 

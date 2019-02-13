@@ -22,12 +22,5 @@ import (
 
 // Actuator acts upon WorkerPool resources.
 type Actuator interface {
-	// Create the operating system config.
-	Create(ctx context.Context, config *extensionsv1alpha1.WorkerPool) error
-	// Delete the operating system config.
-	Delete(ctx context.Context, config *extensionsv1alpha1.WorkerPool) error
-	// Update the operating system config.
-	Update(ctx context.Context, config *extensionsv1alpha1.WorkerPool) error
-	// Exists checks whether the given config currently exists.
-	Exists(ctx context.Context, config *extensionsv1alpha1.WorkerPool) (bool, error)
+	GenerateWorkerPool(context.Context, *extensionsv1alpha1.WorkerPool) (WorkerPool, error)
 }
